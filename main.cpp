@@ -18,6 +18,13 @@ class Graph{
       setcolor(WHITE);
     }
 
+    void selectBar(int index, int value){
+      int x = left + (index+1)*6;
+      setcolor(GREEN);
+      bar(x, bottom-value, x+4, bottom-1);
+      setcolor(WHITE);
+    }
+
     void generateGraph(int arr[], int n){
       // y axis line
       line(left, 10, 10, bottom);
@@ -36,13 +43,15 @@ class Graph{
     }
 
   public:
-    void foo(int arr[], int n){
+    void foo(int arr[], int n, float time){
       // Initialize the graphic mode
       Init();
 
       generateGraph(arr, n);
-      delay(1000);
-      deleteBar(3);
+      delay(time*1000);
+      selectBar(11, arr[11]);
+      delay(time*1000);
+      deleteBar(11);
 
       // Close the graphics mode and deallocates all memory allocated by graphics system
       getchar();
@@ -61,14 +70,15 @@ int main(){
   srand (time(NULL));
   // size of array
   int n=40;
+  int arr[n];
   // range of numbers from 0 to n-1
   int range = 470;
-
-  int arr[n];
-  getRandomArray(arr, n, range);
+  // time inverval for each operation in seconds
+  float time = 0.5;
 
   Graph graph;
-  graph.foo(arr, n);
+  getRandomArray(arr, n, range);
+  graph.foo(arr, n, time);
 
   return 0;
 }
