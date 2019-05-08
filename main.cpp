@@ -2,7 +2,7 @@
 #include <graphics.h>
 #include <stdlib.h>
 #include <time.h>
-
+// #include <string>
 using namespace std;
 
 class Graph{
@@ -16,18 +16,17 @@ class Graph{
       WHITE = 16
     };
 
-    int bottom = 470;
+    int top = 10;
     int left = 10;
-
-    void Init(){
-      int gd = DETECT, gm;
-      initgraph(&gd, &gm, "");
-    }
+    int right = 630;
+    int bottom = 470;
+    int barWidth = 2;
+    int barGap = 1;
 
     void barColor(int index, int value, enum Colors color){
-      int x = left + (index+1)*6;
+      int x = left + (index+1)*(barWidth+barGap);
       setcolor(color);
-      bar(x, bottom-value, x+4, bottom-1);
+      bar(x, bottom-value, x+barWidth, bottom-1);
     }
 
     void addBar(int index, int value){
@@ -35,15 +34,17 @@ class Graph{
     }
 
     void deleteBar(int index){
-      barColor(index, bottom, BLACK);
+      barColor(index, bottom-top, BLACK);
     }
 
-    void generateGraph(int arr[], int n){
+    void generateGraph(int arr[], int n, char s[]){
+      setcolor(WHITE);
+      outtextxy(0, 0, s);
       // y axis line
-      line(left, 10, 10, bottom);
+      line(left, top, left, bottom);
 
       // x axis line
-      line(left, 470, 630, bottom);
+      line(left, bottom, right, bottom);
 
       for(int i=0; i<n;i++){
         addBar(i, arr[i]);
@@ -61,38 +62,56 @@ class Graph{
     }
 
   public:
-
+    // Selection Sort
     void selectionSort(int arr[], int n, float time){
-      // Initialize the graphic mode
-      Init();
+      generateGraph(arr, n, "Selection Sort");
 
-      generateGraph(arr, n);
-
-      int i, j, min_idx;
+      int i, j, min_in;
 
       // One by one move boundary of unsorted subarray
       for(i = 0; i < n-1; i++){
-        // Find the minimum element in unsorted array
-        min_idx = i;
-        barColor(min_idx, arr[min_idx], RED);
+        // Find the minimum element
+        min_in = i;
+        barColor(min_in, arr[min_in], RED);
         for (j = i+1; j < n; j++){
-          if (arr[j] < arr[min_idx]){
-            barColor(min_idx, arr[min_idx], WHITE);
-            min_idx = j;
-            barColor(min_idx, arr[min_idx], RED);
+          if (arr[j] < arr[min_in]){
+            barColor(min_in, arr[min_in], WHITE);
+            min_in = j;
+            barColor(min_in, arr[min_in], RED);
           }
         }
 
-        // Swap the found minimum element with the first element
+        // Swap minimum with first element
         barColor(i, arr[i], RED);
         delay(time*1000);
-        swap(i, min_idx, arr);
+        swap(i, min_in, arr);
       }
       barColor(i, arr[i], GREEN);
+    }
 
-      // Close the graphics mode and deallocates all memory allocated by graphics system
-      getchar();
-      closegraph();
+    // Insertion Sort
+    void insertionSort(int arr[], int n, float time){
+      generateGraph(arr, n, "Insertion Sort");
+      int i, key, j;
+      for(i=1;i<n;i++){
+        barColor(i, arr[i], GREEN);
+        key = arr[i];
+        j = i - 1;
+
+        while (j >= 0 && arr[j] > key){
+          barColor(j, arr[j], RED);
+          delay(time*1000/2);
+          deleteBar(j + 1);
+          arr[j + 1] = arr[j];
+          barColor(j + 1, arr[j + 1], WHITE);
+          j = j - 1;
+        }
+        
+        delay(time*1000/2);
+        deleteBar(j + 1);
+        arr[j + 1] = key;
+        barColor(j + 1, arr[j + 1], WHITE);
+      }
     }
 
 };
@@ -107,19 +126,28 @@ int getRandomArray(int arr[], int n, int range){
 int main(){
   srand (time(NULL));
   // size of array
-  int n=100;
+  int n=200;
   int arr[n];
   // range of numbers from 0 to n-1
-  int range = 470;
+  int range = 460;
   // time inverval for each operation in seconds
-  float time = 0.05;
+  float time = 0.025;
 
+  int gd = DETECT, gm;
+  initgraph(&gd, &gm, "");
   Graph graph;
 
-  // Selection Sort
   getRandomArray(arr, n, range);
   graph.selectionSort(arr, n, time);
 
+  cleardevice();
+
+  getRandomArray(arr, n, range);
+  graph.insertionSort(arr, n, time/10);
+
   // for(int i=0;i<n;i++) cout<<arr[i]<<" ";
+
+  getchar();
+  closegraph();
   return 0;
 }
