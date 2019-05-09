@@ -55,10 +55,31 @@ class Graph{
       int temp = arr[b];
       arr[b] = arr[a];
       deleteBar(b);
-      barColor(b, arr[b], WHITE);
+      addBar(b, arr[b]);
       arr[a] = temp;
       deleteBar(a);
-      barColor(a, arr[a], GREEN);
+      addBar(a, arr[a]);
+    }
+
+    int partition (int arr[], int low, int high, float time) {
+      int pivot = arr[high];
+      int i = (low - 1);
+
+      for(int j = low; j <= high- 1; j++){
+          barColor(j, arr[j], RED);
+          if(arr[j] <= pivot){
+            i++;
+            barColor(i, arr[i], RED);
+            delay(time);
+            swap(i, j, arr);
+          }
+          barColor(j, arr[j], WHITE);
+      }
+      barColor(i + 1, arr[i + 1], RED);
+      barColor(high, arr[high], RED);
+      delay(time);
+      swap(i + 1, high, arr);
+      return (i + 1);
     }
 
   public:
@@ -83,8 +104,9 @@ class Graph{
 
         // Swap minimum with first element
         barColor(i, arr[i], RED);
-        delay(time*1000);
+        delay(time);
         swap(i, min_in, arr);
+        barColor(i, arr[i], GREEN);
       }
       barColor(i, arr[i], GREEN);
     }
@@ -100,20 +122,29 @@ class Graph{
 
         while (j >= 0 && arr[j] > key){
           barColor(j, arr[j], RED);
-          delay(time*1000/2);
+          delay(time/2);
           deleteBar(j + 1);
           arr[j + 1] = arr[j];
           barColor(j + 1, arr[j + 1], WHITE);
           j = j - 1;
         }
-        
-        delay(time*1000/2);
+
+        delay(time/2);
         deleteBar(j + 1);
         arr[j + 1] = key;
         barColor(j + 1, arr[j + 1], WHITE);
       }
     }
 
+    // Quick Sort
+    void quickSort(int arr[], int low, int high, float time) {
+      generateGraph(arr, high+1, "Quick Sort");
+      if(low < high){
+        int part_indx = partition(arr, low, high, time);
+        quickSort(arr, low, part_indx - 1, time);
+        quickSort(arr, part_indx + 1, high, time);
+      }
+    }
 };
 
 // generate random array of size n
@@ -130,20 +161,28 @@ int main(){
   int arr[n];
   // range of numbers from 0 to n-1
   int range = 460;
-  // time inverval for each operation in seconds
-  float time = 0.025;
+  // time inverval for each operation in miliseconds
+  float time = 5;
 
   int gd = DETECT, gm;
   initgraph(&gd, &gm, "");
   Graph graph;
 
+  // Selection Sort
   getRandomArray(arr, n, range);
   graph.selectionSort(arr, n, time);
 
   cleardevice();
 
+  // Insertion Sort
   getRandomArray(arr, n, range);
   graph.insertionSort(arr, n, time/10);
+
+  cleardevice();
+
+  // Quick Sort
+  getRandomArray(arr, n, range);
+  graph.quickSort(arr, 0, n-1, time);
 
   // for(int i=0;i<n;i++) cout<<arr[i]<<" ";
 
