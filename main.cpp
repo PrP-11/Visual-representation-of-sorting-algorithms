@@ -82,6 +82,56 @@ class Graph{
       return (i + 1);
     }
 
+    void merge(int arr[], int l, int m, int r, float time){
+      int i, j, k;
+      int n1 = m - l + 1;
+      int n2 =  r - m;
+
+      int L[n1], R[n2];
+
+      for(i = 0; i < n1; i++)  L[i] = arr[l + i];
+      for(j = 0; j < n2; j++)  R[j] = arr[m + 1+ j];
+
+      //merge the partitions
+      i = 0, j = 0;
+      k = l;
+      while(i<n1 && j<n2){
+        if(L[i] <= R[j]){
+          delay(time/2);
+          deleteBar(k);
+          addBar(k, L[i]);
+          arr[k] = L[i];
+          i++;
+        }
+        else{
+          delay(time/2);
+          deleteBar(k);
+          addBar(k, R[j]);
+          arr[k] = R[j];
+          j++;
+        }
+        k++;
+      }
+
+      while(i < n1){
+        delay(time/2);
+        deleteBar(k);
+        addBar(k, L[i]);
+        arr[k] = L[i];
+        i++;
+        k++;
+      }
+
+      while(j < n2){
+        delay(time/2);
+        deleteBar(k);
+        addBar(k, R[j]);
+        arr[k] = R[j];
+        j++;
+        k++;
+      }
+    }
+
   public:
     // Selection Sort
     void selectionSort(int arr[], int n, float time){
@@ -145,6 +195,22 @@ class Graph{
         quickSort(arr, part_indx + 1, high, time);
       }
     }
+
+    // Merge Sort
+    void mergeSort(int arr[], int l, int r, float time){
+      generateGraph(arr, r+1, "Merge Sort");
+      if(l < r){
+        // Same as (l+r)/2, but avoids overflow for
+        // large l and h
+        int m = l+(r-l)/2;
+
+        // Sort first and second halves
+        mergeSort(arr, l, m, time);
+        mergeSort(arr, m+1, r, time);
+
+        merge(arr, l, m, r, time);
+      }
+    }
 };
 
 // generate random array of size n
@@ -183,6 +249,12 @@ int main(){
   // Quick Sort
   getRandomArray(arr, n, range);
   graph.quickSort(arr, 0, n-1, time);
+
+  cleardevice();
+
+  // Merge Sort
+  getRandomArray(arr, n, range);
+  graph.mergeSort(arr, 0, n-1, time);
 
   // for(int i=0;i<n;i++) cout<<arr[i]<<" ";
 
